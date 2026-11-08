@@ -1,22 +1,25 @@
-# CredLock Technical Support Desk
+# CredLock Technical Support Desk (React + TypeScript)
 
-Vite + vanilla JS + Supabase. Sidebar layout, Chart.js KPI charts, tickets, officers, SLA, incidents, device ops, reports.
+Responsive support operations portal: **Vite · React 18 · TypeScript · Supabase · Chart.js**.
 
-## Setup
+## PowerShell (Windows)
 
-```bash
+```powershell
+cd C:\Users\April\Desktop\credlock-desk-from-github
+Copy-Item .env.example .env
+# Edit .env — set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
-cp .env.example .env
-# Edit .env with Supabase URL + anon key
 npm run dev
 ```
 
-## Migrations (run in order in Supabase SQL Editor)
+> `REM` is for **cmd.exe**. In **PowerShell** use `#` for comments, or omit the comment line.
 
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/migrations/002_seed_kavro.sql`
-3. `supabase/migrations/003_enterprise_support.sql`
-4. `supabase/migrations/004_officer_dept_features.sql`
-5. `supabase/migrations/005_full_support_modules.sql`
+## Migrations
 
-See **SYNC.md** if `src/app.js` is missing after clone.
+Run `supabase/migrations/` **001 → 005** in the Supabase SQL Editor.
+
+## Scripts
+
+- `npm run dev` — local server
+- `npm run build` — production build
+- `npm run preview` — preview build
