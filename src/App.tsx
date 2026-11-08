@@ -1,0 +1,72 @@
+import { useState, type ReactNode } from 'react'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import { AppShell } from './components/layout/AppShell'
+import { LoginPage } from './pages/Login'
+import { DashboardPage } from './pages/Dashboard'
+import { TicketsPage } from './pages/Tickets'
+import { OfficersPage } from './pages/Officers'
+import { IncidentsPage } from './pages/Incidents'
+import { DeviceOpsPage } from './pages/DeviceOps'
+import { ReportsPage } from './pages/Reports'
+import type { TabId } from './types'
+
+function Boot() {
+  const { session, loading, profile } = useAuth()
+  const [tab, setTab] = useState<TabId>('dashboard')
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner" />
+        <p>Loading CredLock Technical Support…</p>
+      </div>
+    )
+  }
+
+  if (!session) return <LoginPage />
+
+  if (profile?.account_status === 'Suspended' || profile?.account_status === 'Inactive') {
+    return (
+      <div className="login-screen">
+        <div className="login-panel card">
+          <h2>Account {profile.account_status}</h2>
+          <p>Contact a Super Admin for access.</p>
+        </div>
+      </div>
+    )
+  }
+
+  const titles: Record<TabId, string> = {
+    dashboard: 'Dashboard',
+    tickets: 'Tickets',
+    officers: 'Officers',
+    incidents: 'Incidents',
+    deviceops: 'Device Ops',
+    kavro: 'KAVRO',
+    documents: 'Documents',
+    reports: 'Reports',
+    team: 'Team',
+  }
+
+  let body: ReactNode = <DashboardPage />
+  if (tab === 'tickets') body = <TicketsPage />
+  else if (tab === 'officers') body = <OfficersPage />
+  else if (tab === 'incidents') body = <IncidentsPage />
+  else if (tab === 'deviceops' || tab === 'kavro') body = <DeviceOpsPage />
+  else if (tab === 'reports' || tab === 'documents') body = <ReportsPage />
+  else if (tab === 'team') body = <OfficersPage teamMode />
+
+  return (
+    <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab]}>
+      {body}
+    </AppShell>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Boot />
+    </AuthProvider>
+  )
+}
