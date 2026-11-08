@@ -147,6 +147,9 @@ body {
   display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
 }
 .chip.b { background: var(--acc2); color: var(--acc); }
+.chip.r { background: #fde8e6; color: var(--bad); }
+.chip.y { background: #fff3d6; color: var(--warn); }
+.chip.g { background: #e3f6ea; color: var(--ok); }
 .grid { display: grid; gap: 12px; }
 .g4 { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 .tile .v { font-size: 1.45rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
@@ -181,6 +184,34 @@ th { color: var(--mute); font-size: 12px; font-weight: 600; white-space: nowrap;
 .report-structure li { margin-bottom: 6px; }
 .hide-sm { display: table-cell; }
 .sidebar-backdrop { display: none; }
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 37, 64, 0.45);
+  display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+}
+.modal {
+  background: var(--panel); border-radius: 14px; width: min(560px, 100%);
+  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow);
+}
+.modal-wide { width: min(760px, 100%); }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+}
+.modal-head h3 { margin: 0; font-size: 1rem; }
+.modal-body { padding: 16px; overflow-y: auto; }
+.modal-footer {
+  padding: 12px 16px; border-top: 1px solid var(--line);
+  display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-grid label, .form-stack label { display: block; font-size: 12px; color: var(--mute); margin-bottom: 4px; }
+.form-grid .span-2 { grid-column: 1 / -1; }
+.form-stack { display: flex; flex-direction: column; gap: 8px; }
+tr.click { cursor: pointer; }
+tr.click:hover { background: var(--acc2); }
+.detail-grid { display: flex; flex-direction: column; gap: 10px; }
+.detail-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px; }
+.detail-row .label { color: var(--mute); font-size: 12px; }
 @media (max-width: 960px) {
   .app-shell { grid-template-columns: minmax(0, 1fr); }
   .sidebar {
@@ -197,6 +228,11 @@ th { color: var(--mute); font-size: 12px; font-weight: 600; white-space: nowrap;
   .content { padding: 12px; }
   .topbar-actions .btn { padding: 8px 10px; font-size: 13px; }
   table { min-width: 360px; }
+}
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .span-2 { grid-column: 1; }
+  .detail-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
   .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
