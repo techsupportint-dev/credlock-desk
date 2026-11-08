@@ -8,6 +8,8 @@ import { OfficersPage } from './pages/Officers'
 import { IncidentsPage } from './pages/Incidents'
 import { DeviceOpsPage } from './pages/DeviceOps'
 import { ReportsPage } from './pages/Reports'
+import { DocumentsPage } from './pages/Documents'
+import { MyMetricsPage } from './pages/MyMetrics'
 import type { TabId } from './types'
 
 function Boot() {
@@ -37,15 +39,17 @@ function Boot() {
   }
 
   const titles: Record<TabId, string> = {
-    dashboard: 'Dashboard',
-    tickets: 'Tickets',
-    officers: 'Officers',
-    incidents: 'Incidents',
-    deviceops: 'Device Ops',
-    kavro: 'KAVRO',
+    dashboard: 'Dashboard / KPI',
+    tickets: 'Tickets & requests',
+    officers: 'Officer management',
+    incidents: 'Incident management',
+    deviceops: 'Device operations',
+    kavro: 'KAVRO / enrollment',
     documents: 'Documents',
-    reports: 'Reports',
-    team: 'Team',
+    reports: 'Management reports',
+    team: 'Team directory',
+    daily: 'Daily report',
+    metrics: 'My metrics',
   }
 
   let body: ReactNode = <DashboardPage />
@@ -53,11 +57,13 @@ function Boot() {
   else if (tab === 'officers') body = <OfficersPage />
   else if (tab === 'incidents') body = <IncidentsPage />
   else if (tab === 'deviceops' || tab === 'kavro') body = <DeviceOpsPage />
-  else if (tab === 'reports' || tab === 'documents') body = <ReportsPage />
+  else if (tab === 'documents') body = <DocumentsPage />
+  else if (tab === 'reports') body = <ReportsPage />
   else if (tab === 'team') body = <OfficersPage teamMode />
+  else if (tab === 'metrics' || tab === 'daily') body = <MyMetricsPage />
 
   return (
-    <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab]}>
+    <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab] || 'CredLock'}>
       {body}
     </AppShell>
   )
