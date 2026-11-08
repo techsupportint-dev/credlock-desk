@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { supabaseConfigured, getSupabaseConfigHint } from '../lib/supabase'
 
 export function LoginPage() {
   const { signIn } = useAuth()
@@ -27,6 +28,9 @@ export function LoginPage() {
             <p className="muted">Tickets · incidents · device ops · KAVRO</p>
           </div>
         </div>
+        {!supabaseConfigured && (
+          <div className="auth-error">{getSupabaseConfigHint()}</div>
+        )}
         {error && <div className="auth-error">{error}</div>}
         <label htmlFor="email">Email</label>
         <input
