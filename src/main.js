@@ -10,7 +10,6 @@ async function boot() {
     renderLogin()
   }
 
-  // Keep UI in sync with auth changes
   supabase.auth.onAuthStateChange((_event, session) => {
     if (session) {
       renderApp(session.user)
