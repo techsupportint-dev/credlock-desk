@@ -13,11 +13,13 @@ const NAV: NavItem[] = [
   { tab: 'tickets', label: 'Tickets', icon: '▣', group: 'ops' },
   { tab: 'officers', label: 'Officers', icon: '◎', group: 'ops' },
   { tab: 'metrics', label: 'My Metrics', icon: '▦', group: 'ops' },
+  { tab: 'daily', label: 'Daily Report', icon: '☰', group: 'ops' },
   { tab: 'deviceops', label: 'Device Ops', icon: '⬡', group: 'tech' },
   { tab: 'kavro', label: 'KAVRO', icon: '⬢', group: 'tech' },
   { tab: 'incidents', label: 'Incidents', icon: '⚠', group: 'tech' },
   { tab: 'documents', label: 'Documents', icon: '📄', group: 'mgmt' },
   { tab: 'reports', label: 'Reports', icon: '▥', group: 'mgmt' },
+  { tab: 'activity', label: 'Activity', icon: '◷', group: 'mgmt' },
   { tab: 'team', label: 'Team', icon: '👤', group: 'mgmt' },
 ]
 

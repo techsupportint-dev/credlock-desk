@@ -10,6 +10,8 @@ import { DeviceOpsPage } from './pages/DeviceOps'
 import { ReportsPage } from './pages/Reports'
 import { DocumentsPage } from './pages/Documents'
 import { MyMetricsPage } from './pages/MyMetrics'
+import { ActivityPage } from './pages/Activity'
+import { DailyReportPage } from './pages/DailyReport'
 import type { TabId } from './types'
 
 function Boot() {
@@ -50,6 +52,7 @@ function Boot() {
     team: 'Team directory',
     daily: 'Daily report',
     metrics: 'My metrics',
+    activity: 'Activity log',
   }
 
   let body: ReactNode = <DashboardPage />
@@ -60,7 +63,9 @@ function Boot() {
   else if (tab === 'documents') body = <DocumentsPage />
   else if (tab === 'reports') body = <ReportsPage />
   else if (tab === 'team') body = <OfficersPage teamMode />
-  else if (tab === 'metrics' || tab === 'daily') body = <MyMetricsPage />
+  else if (tab === 'metrics') body = <MyMetricsPage />
+  else if (tab === 'daily') body = <DailyReportPage />
+  else if (tab === 'activity') body = <ActivityPage />
 
   return (
     <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab] || 'CredLock'}>

@@ -12,6 +12,7 @@ export type TabId =
   | 'team'
   | 'daily'
   | 'metrics'
+  | 'activity'
 
 export interface Profile {
   id: string
