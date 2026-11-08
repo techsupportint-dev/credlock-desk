@@ -91,8 +91,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadProfile])
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return error ? error.message : null
+    const { getSupabaseConfigHint, supabaseConfigured } = await import('../lib/supabase')
+    if (!supabaseConfigured) {
+      return getSupabaseConfigHint() || 'Supabase is not configured.'
+    }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) return error.message
+      return null
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        return (
+          'Cannot reach Supabase (network). Check: (1) .env has the correct VITE_SUPABASE_URL, ' +
+          '(2) you restarted npm run dev after editing .env, ' +
+          '(3) internet/VPN/firewall is not blocking *.supabase.co'
+        )
+      }
+      return msg
+    }
   }, [])
 
   const signOut = useCallback(async () => {
