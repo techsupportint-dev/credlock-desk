@@ -13,6 +13,9 @@ export type TabId =
   | 'daily'
   | 'metrics'
   | 'activity'
+  | 'departments'
+  | 'playbooks'
+  | 'recommendations'
 
 export interface Profile {
   id: string
@@ -90,8 +93,10 @@ export interface DeviceOp {
 export interface DocumentRow {
   id: string
   title?: string
+  filename?: string
   doc_type?: string
   created_at?: string
   uploaded_by?: string
   notes?: string
+  storage_path?: string
 }
