@@ -7,3 +7,5 @@ dist/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+supabase/.temp/
