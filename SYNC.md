@@ -1,39 +1,35 @@
-# Sync remaining files from workspace
+# Complete project sync
 
-Most of the project is on GitHub. The full `src/app.js` (~132 KB) and migrations `003` / `005` should be taken from the project zip or workspace if missing after clone.
+**Repo:** https://github.com/techsupportint-dev/credlock-desk  
+**Your folder:** `C:\\Users\\April\\Desktop\\credlock-desk-from-github`
 
-## On your PC (recommended)
+## Why one Desktop push is needed
 
-```bat
-cd C:\Users\April\Desktop
-git clone https://github.com/techsupportint-dev/credlock-desk.git
-cd credlock-desk
-```
+`src/app.js` is large (~140 KB). The GitHub API path used from the cloud workspace cannot upload that single file in one call. Everything else is already on `main`.
 
-Download `credlock-desk-update.zip` from the project chat, extract, then copy over:
+## One-time finish (on your PC)
 
-- `src\app.js`
-- `supabase\migrations\003_enterprise_support.sql`
-- `supabase\migrations\005_full_support_modules.sql`
-- `package-lock.json` (optional; `npm install` regenerates it)
-
-Then:
+1. Download **credlock-desk-complete.zip** from the project chat / Google Drive.
+2. Extract **over** your folder (replace files).
+3. Then:
 
 ```bat
+cd C:\\Users\\April\\Desktop\\credlock-desk-from-github
 git add -A
-git commit -m "Add full app.js and remaining migrations"
+git status
+git commit -m "Add full src/app.js and remaining project files"
 git push origin main
 ```
 
-After that, future updates can be `git pull` only.
+After that, the whole project lives on GitHub and future updates can use `git pull` / cloud push for smaller files.
 
-## Setup
+## Run the app
 
 ```bat
 copy .env.example .env
-REM edit .env with Supabase URL and anon key
+REM set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
 
-Run SQL migrations 001–005 in order in the Supabase SQL Editor.
+Never commit `.env`.

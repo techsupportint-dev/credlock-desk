@@ -1,23 +1,13 @@
-# CredLock Support Desk + Kavro Tracker
+# CredLock Technical Support Desk
 
-Modern Vite + Supabase technical support platform for CredLock Africa.
-
-## Stack
-
-| Layer | Tool |
-| --- | --- |
-| Frontend | Vite + vanilla JS |
-| Database | Supabase Postgres |
-| Auth | Supabase Auth |
-| Storage | Supabase Storage |
+Vite + vanilla JS + Supabase. Sidebar layout, Chart.js KPI charts, tickets, officers, SLA, incidents, device ops, reports.
 
 ## Setup
 
 ```bash
-cd credlock-desk
 npm install
 cp .env.example .env
-# Edit .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+# Edit .env with Supabase URL + anon key
 npm run dev
 ```
 
@@ -29,21 +19,4 @@ npm run dev
 4. `supabase/migrations/004_officer_dept_features.sql`
 5. `supabase/migrations/005_full_support_modules.sql`
 
-## Modules
-
-- Officer management (search, filters, CSV export, workload metrics)
-- Ticket & request management (statuses, categories, ownership, history)
-- Priority & SLA (P1 5m / P2 10m / P3 30m / P4 2h)
-- Incident management + notes timeline
-- Device & technical operations (KAVRO/MDM, FDX, BNPL, Enrollment)
-- Document center
-- Management report generator (print/PDF)
-- KPI dashboard
-
-## Pull latest on your machine
-
-```bash
-cd C:\\Users\\April\\Desktop\\credlock-desk
-git pull origin main
-npm install
-```
+See **SYNC.md** if `src/app.js` is missing after clone.
