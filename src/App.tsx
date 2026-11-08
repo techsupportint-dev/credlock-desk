@@ -12,6 +12,9 @@ import { DocumentsPage } from './pages/Documents'
 import { MyMetricsPage } from './pages/MyMetrics'
 import { ActivityPage } from './pages/Activity'
 import { DailyReportPage } from './pages/DailyReport'
+import { DepartmentsPage } from './pages/Departments'
+import { PlaybooksPage } from './pages/Playbooks'
+import { RecommendationsPage } from './pages/Recommendations'
 import type { TabId } from './types'
 
 function Boot() {
@@ -47,12 +50,15 @@ function Boot() {
     incidents: 'Incident management',
     deviceops: 'Device operations',
     kavro: 'KAVRO / enrollment',
-    documents: 'Documents',
+    documents: 'Documents & uploads',
     reports: 'Management reports',
     team: 'Team directory',
     daily: 'Daily report',
     metrics: 'My metrics',
     activity: 'Activity log',
+    departments: 'Departments',
+    playbooks: 'Playbooks',
+    recommendations: 'Recommendations',
   }
 
   let body: ReactNode = <DashboardPage />
@@ -66,6 +72,9 @@ function Boot() {
   else if (tab === 'metrics') body = <MyMetricsPage />
   else if (tab === 'daily') body = <DailyReportPage />
   else if (tab === 'activity') body = <ActivityPage />
+  else if (tab === 'departments') body = <DepartmentsPage />
+  else if (tab === 'playbooks') body = <PlaybooksPage />
+  else if (tab === 'recommendations') body = <RecommendationsPage />
 
   return (
     <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab] || 'CredLock'}>
