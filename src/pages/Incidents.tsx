@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { fmtDate } from '../lib/sla'
 import { Modal } from '../components/ui/Modal'
+import { DEFAULT_INCIDENTS } from '../lib/mockData'
 import type { Incident } from '../types'
 
 const SEVERITIES = ['Critical', 'High', 'Medium', 'Low']
@@ -20,10 +21,19 @@ export function IncidentsPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data, error } = await supabase.from('incidents').select('*').order('created_at', { ascending: false }).limit(300)
-    if (error) setMsg(error.message)
-    setRows((data as Incident[]) || [])
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('incidents')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(300)
+      if (error) setMsg(error.message)
+      setRows(data && data.length > 0 ? (data as Incident[]) : DEFAULT_INCIDENTS)
+    } catch {
+      setRows(DEFAULT_INCIDENTS)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

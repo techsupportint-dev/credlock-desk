@@ -15,6 +15,7 @@ import { DailyReportPage } from './pages/DailyReport'
 import { DepartmentsPage } from './pages/Departments'
 import { PlaybooksPage } from './pages/Playbooks'
 import { RecommendationsPage } from './pages/Recommendations'
+import { GoogleSheetsSyncPage } from './pages/GoogleSheetsSync'
 import type { TabId } from './types'
 
 function Boot() {
@@ -59,6 +60,7 @@ function Boot() {
     departments: 'Departments',
     playbooks: 'Playbooks',
     recommendations: 'Recommendations',
+    sheets: 'Google Sheets Integration & Sync',
   }
 
   let body: ReactNode = <DashboardPage />
@@ -75,6 +77,7 @@ function Boot() {
   else if (tab === 'departments') body = <DepartmentsPage />
   else if (tab === 'playbooks') body = <PlaybooksPage />
   else if (tab === 'recommendations') body = <RecommendationsPage />
+  else if (tab === 'sheets') body = <GoogleSheetsSyncPage />
 
   return (
     <AppShell activeTab={tab} onTabChange={setTab} title={titles[tab] || 'CredLock'}>

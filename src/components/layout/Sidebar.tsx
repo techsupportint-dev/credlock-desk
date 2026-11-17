@@ -14,6 +14,7 @@ const NAV: NavItem[] = [
   { tab: 'officers', label: 'Officers', icon: '◎', group: 'ops' },
   { tab: 'metrics', label: 'My Metrics', icon: '▦', group: 'ops' },
   { tab: 'daily', label: 'Daily Report', icon: '☰', group: 'ops' },
+  { tab: 'sheets', label: 'Google Sheets', icon: '⊞', group: 'ops' },
   { tab: 'deviceops', label: 'Device Ops', icon: '⬡', group: 'tech' },
   { tab: 'kavro', label: 'KAVRO', icon: '⬢', group: 'tech' },
   { tab: 'incidents', label: 'Incidents', icon: '⚠', group: 'tech' },

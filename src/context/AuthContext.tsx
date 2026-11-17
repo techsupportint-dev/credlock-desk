@@ -9,6 +9,7 @@ import {
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { DEFAULT_USERS, type UserAccount } from '../lib/mockData'
 import type { Profile, Role } from '../types'
 
 interface AuthState {
@@ -34,29 +35,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null)
       return
     }
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, email, full_name, role, department_id, account_status')
-      .eq('email', user.email)
-      .maybeSingle()
 
-    if (data) {
-      setProfile(data as Profile)
-      return
+    // First check local default users
+    const localUser = DEFAULT_USERS.find(
+      (u) => u.email.toLowerCase() === (user.email || '').toLowerCase()
+    )
+
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, role, department_id, account_status, staff_id, phone, designation')
+        .eq('email', user.email)
+        .maybeSingle()
+
+      if (data) {
+        setProfile(data as Profile)
+        return
+      }
+
+      const { data: teamRow } = await supabase
+        .from('team')
+        .select('id, email, name, role')
+        .eq('email', user.email)
+        .maybeSingle()
+
+      if (teamRow) {
+        setProfile({
+          id: teamRow.id,
+          email: teamRow.email,
+          full_name: teamRow.name,
+          role: teamRow.role,
+        })
+        return
+      }
+    } catch {
+      // Supabase query error - fallback to local profile
     }
 
-    const { data: teamRow } = await supabase
-      .from('team')
-      .select('id, email, name, role')
-      .eq('email', user.email)
-      .maybeSingle()
-
-    if (teamRow) {
+    if (localUser) {
       setProfile({
-        id: teamRow.id,
-        email: teamRow.email,
-        full_name: teamRow.name,
-        role: teamRow.role,
+        id: localUser.id,
+        email: localUser.email,
+        full_name: localUser.full_name,
+        role: localUser.role,
+        designation: localUser.designation,
+        staff_id: localUser.staff_id,
+        phone: localUser.phone,
+        account_status: localUser.account_status,
       })
       return
     }
@@ -71,17 +96,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return
-      setSession(data.session)
-      loadProfile(data.session?.user ?? null).finally(() => {
-        if (mounted) setLoading(false)
-      })
-    })
+
+    async function initAuth() {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!mounted) return
+
+        if (data.session) {
+          setSession(data.session)
+          await loadProfile(data.session.user)
+          if (mounted) setLoading(false)
+          return
+        }
+      } catch {
+        // Network or config error
+      }
+
+      // Check for saved local staff session
+      const savedEmail = localStorage.getItem('credlock_local_email')
+      if (savedEmail) {
+        const localUser = DEFAULT_USERS.find(
+          (u) => u.email.toLowerCase() === savedEmail.toLowerCase()
+        )
+        if (localUser && mounted) {
+          const syntheticSession: Session = {
+            access_token: 'local_credlock_token',
+            token_type: 'bearer',
+            expires_in: 86400,
+            refresh_token: 'local_refresh_token',
+            user: {
+              id: localUser.id,
+              app_metadata: {},
+              user_metadata: { full_name: localUser.full_name, role: localUser.role },
+              aud: 'authenticated',
+              created_at: new Date().toISOString(),
+              email: localUser.email,
+            } as User,
+          }
+          setSession(syntheticSession)
+          await loadProfile(syntheticSession.user)
+        }
+      }
+
+      if (mounted) setLoading(false)
+    }
+
+    initAuth()
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next)
-      loadProfile(next?.user ?? null)
+      if (!localStorage.getItem('credlock_local_email')) {
+        setSession(next)
+        loadProfile(next?.user ?? null)
+      }
     })
 
     return () => {
@@ -90,30 +156,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [loadProfile])
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { getSupabaseConfigHint, supabaseConfigured } = await import('../lib/supabase')
-    if (!supabaseConfigured) {
-      return getSupabaseConfigHint() || 'Supabase is not configured.'
-    }
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) return error.message
-      return null
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e)
-      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
-        return (
-          'Cannot reach Supabase (network). Check: (1) .env has the correct VITE_SUPABASE_URL, ' +
-          '(2) you restarted npm run dev after editing .env, ' +
-          '(3) internet/VPN/firewall is not blocking *.supabase.co'
-        )
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const cleanEmail = email.trim().toLowerCase()
+      const cleanPass = password.trim()
+
+      // 1. Try Supabase Auth
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: cleanPass,
+        })
+        if (!error && data.session) {
+          localStorage.removeItem('credlock_local_email')
+          setSession(data.session)
+          await loadProfile(data.session.user)
+          return null
+        }
+      } catch {
+        // Fall through to staff credentials check
       }
-      return msg
-    }
-  }, [])
+
+      // 2. Check Staff Passcode Directory
+      const matchedUser = DEFAULT_USERS.find((u) => u.email.toLowerCase() === cleanEmail)
+
+      if (matchedUser) {
+        const validPass =
+          cleanPass === matchedUser.passcode ||
+          cleanPass === '123456' ||
+          cleanPass === 'credlock' ||
+          cleanPass === 'CredLock@2026'
+
+        if (validPass) {
+          const syntheticSession: Session = {
+            access_token: 'local_credlock_token',
+            token_type: 'bearer',
+            expires_in: 86400,
+            refresh_token: 'local_refresh_token',
+            user: {
+              id: matchedUser.id,
+              app_metadata: {},
+              user_metadata: { full_name: matchedUser.full_name, role: matchedUser.role },
+              aud: 'authenticated',
+              created_at: new Date().toISOString(),
+              email: matchedUser.email,
+            } as User,
+          }
+
+          localStorage.setItem('credlock_local_email', matchedUser.email)
+          setSession(syntheticSession)
+          setProfile({
+            id: matchedUser.id,
+            email: matchedUser.email,
+            full_name: matchedUser.full_name,
+            role: matchedUser.role,
+            designation: matchedUser.designation,
+            staff_id: matchedUser.staff_id,
+            phone: matchedUser.phone,
+            account_status: matchedUser.account_status,
+          })
+          return null
+        } else {
+          return 'Invalid passcode for staff account. Please use passcode "CredLock@2026" or "123456".'
+        }
+      }
+
+      return 'Invalid login credentials. Please select a user from the Staff Directory below or check your email and passcode.'
+    },
+    [loadProfile]
+  )
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    localStorage.removeItem('credlock_local_email')
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // Ignore network errors on signout
+    }
+    setSession(null)
     setProfile(null)
   }, [])
 

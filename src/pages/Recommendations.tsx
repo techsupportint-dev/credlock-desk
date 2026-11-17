@@ -16,6 +16,69 @@ interface Row {
 
 const STATUSES = ['Open', 'In Progress', 'Completed', 'Closed']
 
+const DEFAULT_RECOMMENDATIONS: Row[] = [
+  {
+    id: 'rec-1',
+    title: 'FDX Exception Management — Same-Day Manual Responses',
+    body: 'Handle legacy post-payment locks with same-day manual responses while FDX engine updates are externally managed. Measure: paid-but-locked complaints trend down week over week.',
+    source: 'Technical Support + Engineering',
+    status: 'In Progress',
+    priority: 'High',
+    due_date: '2026-11-30',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+  {
+    id: 'rec-2',
+    title: 'Confirm FDX Root Cause of Post-Payment Lock Exceptions',
+    body: 'Confirm FDX root cause of post-payment lock exceptions with Engineering. Establish documented escalation path and telemetry hooks.',
+    source: 'Technical Support + Engineering',
+    status: 'Open',
+    priority: 'High',
+    due_date: '2026-12-05',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+  {
+    id: 'rec-3',
+    title: 'Enrollment Monitoring by Device Model & APK Fallback',
+    body: 'Log enrollment issues by device model and track residual APK installer failures so QR/APK regressions on new Samsung and Itel models are caught early.',
+    source: 'Technical Support',
+    status: 'Open',
+    priority: 'Medium',
+    due_date: '2026-12-15',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+  {
+    id: 'rec-4',
+    title: 'Correct Lobi AI Aging Calculation & Overdue Algorithm',
+    body: 'Correct Lobi AI aging calculation linked to 16 aging tickets. Run weekly aging reviews and trigger automated escalation at the SLA threshold.',
+    source: 'Technical Support + Engineering',
+    status: 'In Progress',
+    priority: 'Critical',
+    due_date: '2026-11-20',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+  {
+    id: 'rec-5',
+    title: 'Redistribute Officer Ticket Workloads (85% Concentration)',
+    body: '85% of ticket volume currently sits with three officers. Review individual allocations, introduce automated round-robin routing, and balance shift schedules.',
+    source: 'Technical Support Leadership',
+    status: 'Open',
+    priority: 'High',
+    due_date: '2026-11-25',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+  {
+    id: 'rec-6',
+    title: 'KAVRO Manager App Uninstallation Real-Time Alerts',
+    body: 'Add real-time alerts to the KAVRO engine capturing reason, device details and timestamp, so every uninstallation is detected, explained and traceable.',
+    source: 'Engineering + Support Review',
+    status: 'Open',
+    priority: 'Medium',
+    due_date: '2026-12-10',
+    created_at: '2026-11-01T08:00:00.000Z',
+  },
+]
+
 export function RecommendationsPage() {
   const { profile, role } = useAuth()
   const [rows, setRows] = useState<Row[]>([])
@@ -27,10 +90,19 @@ export function RecommendationsPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data, error } = await supabase.from('recommendations').select('*').order('created_at', { ascending: false }).limit(200)
-    if (error) setMsg(error.message)
-    setRows((data as Row[]) || [])
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('recommendations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200)
+      if (error) setMsg(error.message)
+      setRows(data && data.length > 0 ? (data as Row[]) : DEFAULT_RECOMMENDATIONS)
+    } catch {
+      setRows(DEFAULT_RECOMMENDATIONS)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

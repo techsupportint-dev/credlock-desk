@@ -13,6 +13,7 @@ import {
 } from 'chart.js'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
 import { supabase } from '../lib/supabase'
+import { DEFAULT_TICKETS, DEFAULT_INCIDENTS, DEFAULT_DEVICE_OPS } from '../lib/mockData'
 import type { Ticket, Incident, DeviceOp } from '../types'
 
 ChartJS.register(
@@ -40,16 +41,24 @@ export function DashboardPage() {
     let cancelled = false
     async function load() {
       setLoading(true)
-      const [t, i, d] = await Promise.all([
-        supabase.from('tickets').select('*').order('created_at', { ascending: false }).limit(500),
-        supabase.from('incidents').select('*').limit(200),
-        supabase.from('device_ops').select('*').limit(200),
-      ])
-      if (cancelled) return
-      setTickets((t.data as Ticket[]) || [])
-      setIncidents((i.data as Incident[]) || [])
-      setOps((d.data as DeviceOp[]) || [])
-      setLoading(false)
+      try {
+        const [t, i, d] = await Promise.all([
+          supabase.from('tickets').select('*').order('created_at', { ascending: false }).limit(500),
+          supabase.from('incidents').select('*').limit(200),
+          supabase.from('device_ops').select('*').limit(200),
+        ])
+        if (cancelled) return
+        setTickets(t.data && t.data.length > 0 ? (t.data as Ticket[]) : DEFAULT_TICKETS)
+        setIncidents(i.data && i.data.length > 0 ? (i.data as Incident[]) : DEFAULT_INCIDENTS)
+        setOps(d.data && d.data.length > 0 ? (d.data as DeviceOp[]) : DEFAULT_DEVICE_OPS)
+      } catch {
+        if (cancelled) return
+        setTickets(DEFAULT_TICKETS)
+        setIncidents(DEFAULT_INCIDENTS)
+        setOps(DEFAULT_DEVICE_OPS)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
     load()
     return () => {

@@ -14,6 +14,54 @@ interface Row {
   created_at?: string
 }
 
+const DEFAULT_PLAYBOOKS: Row[] = [
+  {
+    id: 'kb-0001',
+    title: 'Overview of CredLock Technical Support Operations',
+    category: 'General Support',
+    problem: 'Support CredLock BNPL operations by resolving technical complaints from customers, merchants and internal departments.',
+    steps: '1. Device troubleshooting.\n2. Enrollment support and IMEI validation.\n3. KAVRO and FDX issue management.\n4. Incident documentation and ticket escalation to Engineering.\n5. Coordinate with Compliance and Merchant Relations when policy intervention is required.',
+    escalate: 'Escalate to Engineering or Compliance based on incident severity matrix.',
+    created_at: '2026-11-10T08:00:00.000Z',
+  },
+  {
+    id: 'kb-0002',
+    title: 'Device / App Unlock — Recurring Workload & Standard Response',
+    category: 'Unlock / Removal',
+    problem: 'Device / app unlock requests account for 81% of operations volume (manual removals and unlocks).',
+    steps: '1. Verify settlement receipt in Paystack / Core Banking.\n2. Execute unlock command via Device Operations console.\n3. Verify device state propagation over cellular / WiFi.\n4. Send confirmation SMS to customer.',
+    escalate: 'Automate payment / extension unlock and monitor state propagation.',
+    created_at: '2026-10-31T09:00:00.000Z',
+  },
+  {
+    id: 'kb-0003',
+    title: 'Device Lock / Full Lock After Payment Resolution',
+    category: 'Unlock / Removal',
+    problem: 'Device remains locked after the customer has paid or extended loan terms.',
+    steps: '1. Check payment webhook delivery timestamp.\n2. Check server-to-device policy receipt.\n3. Issue manual override full-lock release.\n4. Request customer to restart device or toggle airplane mode.',
+    escalate: 'Escalate to Engineering if device remains locked >15 minutes post-payment.',
+    created_at: '2026-10-31T10:00:00.000Z',
+  },
+  {
+    id: 'kb-0004',
+    title: 'App / X Manager Removal Standard SOP',
+    category: 'Unlock / Removal',
+    problem: 'Manager / Credlock / X Manager app removal after full loan completion.',
+    steps: '1. Verify zero loan balance in finance portal.\n2. Issue Release Device & Remove Profile command from console.\n3. Prompt customer to complete uninstallation wizard.\n4. Record completion receipt in Issue Log.',
+    escalate: 'Escalate to Finance if payment verification is ambiguous.',
+    created_at: '2026-10-31T11:00:00.000Z',
+  },
+  {
+    id: 'kb-0005',
+    title: 'Paid-but-Locked Complaints: FDX versus KAVRO Diagnostic',
+    category: 'KAVRO Sync',
+    problem: 'Why paid-but-locked complaints originate mostly from FDX compared to KAVRO.',
+    steps: '1. For FDX: Customer repays -> device stays locked -> priority manual unlock required.\n2. For KAVRO: Customer repays -> device connects to mobile data -> auto-lock releases.\n3. Identify customer engine type before executing commands.',
+    escalate: 'Engineering escalation for root-cause engine synchronization.',
+    created_at: '2026-10-31T12:00:00.000Z',
+  },
+]
+
 export function PlaybooksPage() {
   const { role } = useAuth()
   const [rows, setRows] = useState<Row[]>([])
@@ -27,10 +75,19 @@ export function PlaybooksPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data, error } = await supabase.from('playbooks').select('*').order('created_at', { ascending: false }).limit(200)
-    if (error) setMsg(error.message)
-    setRows((data as Row[]) || [])
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('playbooks')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200)
+      if (error) setMsg(error.message)
+      setRows(data && data.length > 0 ? (data as Row[]) : DEFAULT_PLAYBOOKS)
+    } catch {
+      setRows(DEFAULT_PLAYBOOKS)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

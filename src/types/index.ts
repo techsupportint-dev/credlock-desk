@@ -16,6 +16,10 @@ export type TabId =
   | 'departments'
   | 'playbooks'
   | 'recommendations'
+  | 'sheets'
+  | 'call_logs'
+  | 'officer_reports'
+  | 'devices'
 
 export interface Profile {
   id: string
@@ -38,8 +42,8 @@ export interface Ticket {
   priority?: string
   category?: string
   issue_type?: string
-  officer?: string
-  assigned_to?: string
+  officer?: string | null
+  assigned_to?: string | null
   created_at?: string
   escalated?: boolean
   escalated_at?: string | null
@@ -99,4 +103,80 @@ export interface DocumentRow {
   uploaded_by?: string
   notes?: string
   storage_path?: string
+}
+
+export interface CallLog {
+  id: string
+  call_id: string
+  interaction_id?: string
+  officer_id?: string
+  officer_name?: string
+  direction: 'Incoming' | 'Outgoing' | string
+  caller_number?: string
+  start_time?: string
+  duration_sec?: number | string
+  answer_status?: string
+}
+
+export interface ActivityLog {
+  id: string
+  activity_id: string
+  interaction_id?: string
+  officer_id?: string
+  officer_name?: string
+  channel?: string
+  source?: string
+  customer?: string
+  customer_number?: string
+  activity_type?: string
+  created_at?: string
+  notes?: string
+}
+
+export interface OfficerReport {
+  id: string
+  report_id: string
+  date?: string
+  officer?: string
+  period?: string
+  whatsapp_report?: string
+  lobi_ai_report?: string
+  challenges?: string
+  issues?: string
+  notes?: string
+}
+
+export interface DepartmentItem {
+  id: string
+  dept_id?: string
+  name: string
+  lead?: string
+  email?: string
+  status?: string
+  notes?: string
+}
+
+export interface DeviceRecord {
+  id: string
+  device_id: string
+  officer_id?: string
+  officer_name?: string
+  phone_number?: string
+  manufacturer?: string
+  model?: string
+  imei?: string
+  android_id?: string
+  status?: string
+}
+
+export interface EnrollmentRecord {
+  id: string
+  entry_id: string
+  date?: string
+  device_manufacturer?: string
+  device_model?: string
+  enrollment_method?: string
+  enrollment_result?: string
+  identified_on_kavro?: string
+  merchant_ref?: string
 }
